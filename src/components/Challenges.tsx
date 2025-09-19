@@ -3,228 +3,113 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { CheckCircle, Trophy, Lightbulb, Target, Clock } from 'lucide-react';
-import { challenges, Challenge } from '../data/challengeData';
+import { Timer, Zap, Bug, Battery } from 'lucide-react';
+import ComponentDash from './challenges/ComponentDash';
+import BugHunter from './challenges/BugHunter';
+import PowerSaver from './challenges/PowerSaver';
 
 const Challenges: React.FC = () => {
-  const [completedChallenges, setCompletedChallenges] = useState<number[]>([]);
-  const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null);
+  const [activeChallenge, setActiveChallenge] = useState<string | null>(null);
+  const [completedChallenges, setCompletedChallenges] = useState<string[]>([]);
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy': return 'bg-success text-success-foreground';
-      case 'medium': return 'bg-warning text-warning-foreground';
-      case 'hard': return 'bg-destructive text-destructive-foreground';
-      default: return 'bg-primary text-primary-foreground';
-    }
-  };
-
-  const getDifficultyIcon = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy': return '⭐';
-      case 'medium': return '⭐⭐';
-      case 'hard': return '⭐⭐⭐';
-      default: return '⭐';
-    }
-  };
-
-  const markAsCompleted = (challengeId: number) => {
+  const handleChallengeComplete = (challengeId: string, score: number) => {
     if (!completedChallenges.includes(challengeId)) {
       setCompletedChallenges([...completedChallenges, challengeId]);
     }
+    setActiveChallenge(null);
   };
 
-  const easyChanges = challenges.filter(c => c.difficulty === 'easy');
-  const mediumChallenges = challenges.filter(c => c.difficulty === 'medium');
-  const hardChallenges = challenges.filter(c => c.difficulty === 'hard');
+  const timedChallenges = [
+    {
+      id: 'component-dash',
+      title: 'Component Dash',
+      description: 'Rapid-fire component identification challenge',
+      icon: '⚡',
+      time: '90 seconds',
+      objective: 'Identify 15 electronic components correctly'
+    },
+    {
+      id: 'bug-hunter',
+      title: 'Bug Hunter',
+      description: 'Find and fix circuit errors quickly',
+      icon: '🔍',
+      time: '3 minutes',
+      objective: 'Find bugs in 5 different circuits'
+    },
+    {
+      id: 'power-saver',
+      title: 'Power Saver',
+      description: 'Build energy-efficient circuits',
+      icon: '🔋',
+      time: 'No time limit',
+      objective: 'Minimize power consumption in 3 challenges'
+    }
+  ];
 
-  const ChallengeCard = ({ challenge }: { challenge: Challenge }) => (
-    <Card className="h-full hover:shadow-hover transition-all duration-200">
-      <CardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-lg">{challenge.title}</CardTitle>
-          {completedChallenges.includes(challenge.id) && (
-            <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge className={getDifficultyColor(challenge.difficulty)}>
-            {getDifficultyIcon(challenge.difficulty)} {challenge.difficulty}
-          </Badge>
-          {challenge.targetValue && (
-            <Badge variant="outline" className="gap-1">
-              <Target className="w-3 h-3" />
-              {challenge.targetValue}
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground">{challenge.description}</p>
-        <div className="space-y-2">
-          <div className="text-sm font-medium">Required Components:</div>
-          <div className="flex flex-wrap gap-1">
-            {challenge.requiredComponents.map((component, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                {component}
-              </Badge>
-            ))}
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setSelectedChallenge(challenge)}
-              >
-                View Details
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  {challenge.title}
-                  <Badge className={getDifficultyColor(challenge.difficulty)}>
-                    {challenge.difficulty}
-                  </Badge>
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Target className="w-4 h-4" />
-                    Objective
-                  </h4>
-                  <p className="text-sm text-muted-foreground mt-1">{challenge.objective}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold">Description</h4>
-                  <p className="text-sm text-muted-foreground mt-1">{challenge.description}</p>
-                </div>
+  if (activeChallenge === 'component-dash') {
+    return <ComponentDash onComplete={(score) => handleChallengeComplete('component-dash', score)} />;
+  }
 
-                <div>
-                  <h4 className="font-semibold">Required Components</h4>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {challenge.requiredComponents.map((component, index) => (
-                      <Badge key={index} variant="secondary">
-                        {component}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+  if (activeChallenge === 'bug-hunter') {
+    return <BugHunter onComplete={(score) => handleChallengeComplete('bug-hunter', score)} />;
+  }
 
-                <div>
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Lightbulb className="w-4 h-4" />
-                    Hints
-                  </h4>
-                  <ul className="text-sm text-muted-foreground mt-1 space-y-1">
-                    {challenge.hints.map((hint, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-primary">•</span>
-                        <span>{hint}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="bg-muted p-4 rounded-lg">
-                  <h4 className="font-semibold flex items-center gap-2 mb-2">
-                    <Trophy className="w-4 h-4" />
-                    Solution
-                  </h4>
-                  <p className="text-sm">{challenge.solution}</p>
-                </div>
-
-                <Button 
-                  onClick={() => markAsCompleted(challenge.id)}
-                  disabled={completedChallenges.includes(challenge.id)}
-                  className="w-full"
-                >
-                  {completedChallenges.includes(challenge.id) ? (
-                    <>
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Completed
-                    </>
-                  ) : (
-                    'Mark as Completed'
-                  )}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-          <Button 
-            size="sm" 
-            onClick={() => markAsCompleted(challenge.id)}
-            disabled={completedChallenges.includes(challenge.id)}
-          >
-            {completedChallenges.includes(challenge.id) ? (
-              <CheckCircle className="w-4 h-4" />
-            ) : (
-              'Start'
-            )}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  if (activeChallenge === 'power-saver') {
+    return <PowerSaver onComplete={(score) => handleChallengeComplete('power-saver', score)} />;
+  }
 
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold">Electronics Challenges</h2>
+        <h2 className="text-3xl font-bold">Timed Challenges</h2>
         <p className="text-muted-foreground">
-          Test your skills with hands-on circuit building challenges
+          Test your speed and accuracy with these exciting challenges
         </p>
         <div className="flex justify-center gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-success" />
-            <span>{completedChallenges.length} / {challenges.length} Completed</span>
+            <Timer className="w-4 h-4 text-success" />
+            <span>{completedChallenges.length} / {timedChallenges.length} Completed</span>
           </div>
         </div>
       </div>
 
-      <Tabs defaultValue="easy" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="easy" className="gap-2">
-            ⭐ Easy ({easyChanges.length})
-          </TabsTrigger>
-          <TabsTrigger value="medium" className="gap-2">
-            ⭐⭐ Medium ({mediumChallenges.length})
-          </TabsTrigger>
-          <TabsTrigger value="hard" className="gap-2">
-            ⭐⭐⭐ Hard ({hardChallenges.length})
-          </TabsTrigger>
-        </TabsList>
+      <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6">
+        {timedChallenges.map((challenge) => (
+          <Card key={challenge.id} className="h-full hover:shadow-hover transition-all duration-200">
+            <CardHeader className="text-center">
+              <div className="text-4xl mb-2">{challenge.icon}</div>
+              <CardTitle className="flex items-center justify-center gap-2">
+                {challenge.title}
+                {completedChallenges.includes(challenge.id) && (
+                  <Badge variant="secondary" className="bg-success text-success-foreground">
+                    ✓
+                  </Badge>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">{challenge.description}</p>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-center gap-2 text-sm">
+                  <Timer className="w-4 h-4" />
+                  <span>{challenge.time}</span>
+                </div>
+                <div className="text-xs text-muted-foreground text-center">
+                  {challenge.objective}
+                </div>
+              </div>
 
-        <TabsContent value="easy" className="space-y-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {easyChanges.map((challenge) => (
-              <ChallengeCard key={challenge.id} challenge={challenge} />
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="medium" className="space-y-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {mediumChallenges.map((challenge) => (
-              <ChallengeCard key={challenge.id} challenge={challenge} />
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="hard" className="space-y-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {hardChallenges.map((challenge) => (
-              <ChallengeCard key={challenge.id} challenge={challenge} />
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+              <Button 
+                onClick={() => setActiveChallenge(challenge.id)}
+                className="w-full gap-2"
+              >
+                {completedChallenges.includes(challenge.id) ? 'Play Again' : 'Start Challenge'}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };

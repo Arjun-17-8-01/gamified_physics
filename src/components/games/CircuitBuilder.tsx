@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Zap, CheckCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Trophy, Zap, CheckCircle, Wrench, BookOpen } from 'lucide-react';
 
 interface CircuitBuilderProps {
   onComplete: (score: number) => void;
 }
 
 const CircuitBuilder: React.FC<CircuitBuilderProps> = ({ onComplete }) => {
-  const [gameStarted, setGameStarted] = useState(false);
-  const [currentChallenge, setCurrentChallenge] = useState(0);
+  const [mode, setMode] = useState<'menu' | 'sandbox' | 'project'>('menu');
+  const [currentProject, setCurrentProject] = useState(0);
   const [score, setScore] = useState(0);
-  const [completedChallenges, setCompletedChallenges] = useState<boolean[]>([]);
+  const [completedProjects, setCompletedProjects] = useState<boolean[]>([]);
 
   const challenges = [
     {
