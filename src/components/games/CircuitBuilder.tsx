@@ -43,26 +43,26 @@ const CircuitBuilder: React.FC<CircuitBuilderProps> = ({ onComplete }) => {
   ];
 
   const startGame = () => {
-    setGameStarted(true);
+    setMode('project');
     setScore(0);
-    setCurrentChallenge(0);
-    setCompletedChallenges(new Array(challenges.length).fill(false));
+    setCurrentProject(0);
+    setCompletedProjects(new Array(challenges.length).fill(false));
   };
 
   const completeChallenge = () => {
-    const newCompleted = [...completedChallenges];
-    newCompleted[currentChallenge] = true;
-    setCompletedChallenges(newCompleted);
+    const newCompleted = [...completedProjects];
+    newCompleted[currentProject] = true;
+    setCompletedProjects(newCompleted);
     setScore(score + 1);
 
-    if (currentChallenge < challenges.length - 1) {
-      setCurrentChallenge(currentChallenge + 1);
+    if (currentProject < challenges.length - 1) {
+      setCurrentProject(currentProject + 1);
     } else {
       onComplete(score + 1);
     }
   };
 
-  if (!gameStarted) {
+  if (mode === 'menu') {
     return (
       <Card className="max-w-2xl mx-auto">
         <CardHeader className="text-center">
@@ -96,7 +96,7 @@ const CircuitBuilder: React.FC<CircuitBuilderProps> = ({ onComplete }) => {
     );
   }
 
-  const challenge = challenges[currentChallenge];
+  const challenge = challenges[currentProject];
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -109,7 +109,7 @@ const CircuitBuilder: React.FC<CircuitBuilderProps> = ({ onComplete }) => {
             </CardTitle>
             <div className="flex items-center gap-2">
               <Badge variant="outline">
-                Challenge {currentChallenge + 1} of {challenges.length}
+                Challenge {currentProject + 1} of {challenges.length}
               </Badge>
               <Badge className="bg-primary">
                 Score: {score}
@@ -179,8 +179,8 @@ const CircuitBuilder: React.FC<CircuitBuilderProps> = ({ onComplete }) => {
               <div 
                 key={index}
                 className={`p-4 rounded-lg border ${
-                  completedChallenges[index] ? 'bg-success/10 border-success' :
-                  index === currentChallenge ? 'bg-primary/10 border-primary' :
+                  completedProjects[index] ? 'bg-success/10 border-success' :
+                  index === currentProject ? 'bg-primary/10 border-primary' :
                   'bg-muted border-border'
                 }`}
               >
@@ -189,10 +189,10 @@ const CircuitBuilder: React.FC<CircuitBuilderProps> = ({ onComplete }) => {
                     <div className="font-medium">{chall.title}</div>
                     <div className="text-sm text-muted-foreground">{chall.difficulty}</div>
                   </div>
-                  {completedChallenges[index] && (
+                  {completedProjects[index] && (
                     <CheckCircle className="w-5 h-5 text-success" />
                   )}
-                  {index === currentChallenge && !completedChallenges[index] && (
+                  {index === currentProject && !completedProjects[index] && (
                     <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                   )}
                 </div>
